@@ -1,5 +1,9 @@
 # Timed
 
+[![Build Status](https://travis-ci.org/seblindberg/ruby-timed.svg?branch=master)](https://travis-ci.org/seblindberg/ruby-timed)
+[![Coverage Status](https://coveralls.io/repos/github/seblindberg/ruby-timed/badge.svg?branch=master)](https://coveralls.io/github/seblindberg/ruby-timed?branch=master)
+[![Inline docs](http://inch-ci.org/github/seblindberg/ruby-timed.svg?branch=master)](http://inch-ci.org/github/seblindberg/ruby-timed)
+
 Gem for working with timed, ordered items. Currently under development.
 
 ## Installation
