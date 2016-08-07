@@ -128,17 +128,22 @@ describe Timed::Item do
   end
   
   describe '#append' do
+    it 'accepts correctly ordered items' do
+      item.append item_after
+      assert_same item_after, item.next
+    end
+    
     it 'raises an error it the items are not sequential' do
       assert_raises { item_after.append item }
     end
       
     it 'raises an error it the items overlap' do
-      assert_raises { item.append item_during }
-    end
-    
-    it 'accepts correctly ordered items' do
-      item.append item_after
-      assert_same item_after, item.next
+      item_a = subject.new 0..10
+      item_b = subject.new 20..30
+      item_a.append item_b
+      
+      assert_raises { item_a.append(subject.new 5..15) }
+      assert_raises { item_a.append(subject.new 15..25) }
     end
     
     it 'accepts objects responding to #begin and #end' do
@@ -151,17 +156,22 @@ describe Timed::Item do
   end
   
   describe '#prepend' do
+    it 'accepts correctly ordered items' do
+      item_after.prepend item
+      assert_same item, item_after.previous
+    end
+      
     it 'raises an error it the items are not sequential' do
       assert_raises { item.prepend item_after }
     end
 
     it 'raises an error it the items overlap' do
-      assert_raises { item_during.prepend item }
-    end
-
-    it 'accepts correctly ordered items' do
-      item_after.prepend item
-      assert_same item, item_after.previous
+      item_a = subject.new 0..10
+      item_b = subject.new 20..30
+      item_a.append item_b
+      
+      assert_raises { item_b.prepend(subject.new 15..25) }
+      assert_raises { item_b.prepend(subject.new 5..15) }
     end
     
     it 'accepts objects responding to #begin and #end' do
