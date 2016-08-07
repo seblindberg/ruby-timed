@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Sebastian Lindberg"]
   spec.email         = ["seb.lindberg@gmail.com"]
 
-  spec.summary       = %q{Gem for working with timed items, laid out sequentially in a sequence.}
+  spec.summary       = %q{Gem for working with timed, ordered items.}
   #spec.description   = %q{TODO: Write a longer description or delete this line.}
-  #spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = "https://github.com/seblindberg/ruby-timed"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
