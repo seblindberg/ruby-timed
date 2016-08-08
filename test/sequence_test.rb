@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'test_helper'
 
 describe Timed::Sequence do
@@ -60,6 +61,32 @@ describe Timed::Sequence do
     it 'returns the time covered by the items' do
       true_time = item_a.duration + item_b.duration
       assert_equal true_time, sequence.time
+    end
+  end
+  
+  describe '#first' do
+    it 'behaves like the Linked::List#first' do
+      assert_same item_a, sequence.first
+      assert_same item_b, sequence.first(2)[1]
+    end
+    
+    it 'accepts the argument after' do
+      assert_same item_a, sequence.first(after: item_a.begin)
+      assert_same item_b, sequence.first(after: item_a)
+      assert_nil sequence.first(after: item_b)
+    end
+  end
+  
+  describe '#last' do
+    it 'behaves like the Linked::List#last' do
+      assert_same item_b, sequence.last
+      assert_same item_a, sequence.last(2)[0]
+    end
+
+    it 'accepts the argument before' do
+      assert_same item_b, sequence.last(before: item_b.end)
+      assert_same item_a, sequence.last(before: item_b)
+      assert_nil sequence.last(before: item_a)
     end
   end
   

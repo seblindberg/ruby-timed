@@ -25,6 +25,40 @@ module Timed
       each_item.reduce(0) { |a, e| a + e.duration }
     end
     
+    # Extends the standard behaviour of Linked::List#first with the option of
+    # only returning items that begin after a specified time.
+    #
+    # after - a time after which the returned item(s) must occur.
+    #
+    # Returns one or more items, or nil if there are no items after the given
+    # time.
+    #
+    # TODO: When given an Item to start after, and that item is in the list,
+    #       start directly from the item.
+    
+    def first(n = 1, after: nil, &block)
+      return super(n, &block) unless after
+      
+      super(n) { |item| item.after? after }
+    end
+    
+    # Extends the standard behaviour of Linked::List#last with the option of
+    # only returning items that end before a specified time.
+    #
+    # after - a time after which the returned item(s) must occur.
+    #
+    # Returns one or more items, or nil if there are no items before the given
+    # time.
+    #
+    # TODO: When given an Item to start before, and that item is in the list,
+    #       start directly from the item.
+    
+    def last(n = 1, before: nil, &block)
+      return super(n, &block) unless before
+      
+      super(n) { |item| item.before? before }
+    end
+    
     # This method takes a second sequence and iterates over each intersection
     # between the two. If a block is given, the beginning and end of each
     # intersecting period will be yielded to it. Otherwise an enumerator is
