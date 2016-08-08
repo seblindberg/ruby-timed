@@ -1,7 +1,7 @@
 module Timed
   class Sequence
-    include Linked::List
     include Moment
+    include Linked::List
     
     # Returns the time at which the first item in the sequence, and therefore
     # the sequence as a whole, begins. If the sequence is empty, by convention,
