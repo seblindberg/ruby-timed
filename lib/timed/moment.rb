@@ -2,7 +2,12 @@ module Timed
   # Timed Moment
   #
   # By including this module into any object that responds to #begin and #end,
-  # it can be compared with other moments of time.
+  # it can be compared with other moments in time.
+  #
+  # To fully support the Moment module the following must hold:
+  # a) #begin returns a Numeric value
+  # b) #end returns a Numeric value larger than (or equal to) begin
+  # c) a new object can be created by a single range-like argument
   
   module Moment
     # Returns the moment duration.
@@ -21,31 +26,42 @@ module Timed
       false
     end
     
-    # Returns true if the moment ends before the other one begins.
+    # Returns true if the moment ends before the other one begins. If given a
+    # numeric value it will be treated like instantaneous moment in time.
     #
-    # other - object that implements #begin.
+    # other - object that implements #begin, or a numeric value.
     
     def before?(other)
-      self.end <= other.begin
+      time = other.is_a?(Numeric) ? other : other.begin
+      self.end <= time
     end
     
-    # Returns true if the moment begins after the other one ends.
+    # Returns true if the moment begins after the other one ends. If given a
+    # numeric value it will be treated like instantaneous moment in time.
     #
-    # other - object that implements #end.
+    # other - object that implements #end, or a numeric value.
     
     def after?(other)
-      self.begin >= other.end
+      time = other.is_a?(Numeric) ? other : other.end
+      self.begin >= time
     end
     
-    # Returns true if the moment overlaps with the other one.
+    # Returns true if the moment overlaps with the other one. If given a
+    # numeric value it will be treated like instantaneous moment in time.
     #
-    # other - object that implements both #begin and #end.
+    # other - object that implements both #begin and #end, or a numeric value.
     
     def during?(other)
+      if other.is_a? Numeric
+        time_begin = time_end = other
+      else
+        time_begin = other.begin
+        time_end = other.begin
+      end
       # Check if either of the two items begins during the
       # span of the other
-      other.begin <= self.begin && self.begin <= other.end ||
-        self.begin <= other.begin && other.begin <= self.end
+      time_begin <= self.begin && self.begin <= time_end ||
+        self.begin <= time_begin && time_begin <= self.end
     end
     
     # Returns a new moment in the intersection
@@ -56,7 +72,7 @@ module Timed
       begin_at = self.begin >= other.begin ? self.begin : other.begin
       end_at = self.end <= other.end ? self.end : other.end
       
-      begin_at <= end_at ? self.class.new(begin_at, end_at) : nil
+      begin_at <= end_at ? self.class.new(begin_at..end_at) : nil
     end
     
     alias & intersect

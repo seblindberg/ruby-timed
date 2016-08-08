@@ -18,7 +18,7 @@ describe Timed::Moment do
     TestHelper.range 10.0...range.end, range_after.begin..30.0 }
   let(:range_after) { TestHelper.range 20.0..30.0, 31.0..40.0 }
   let(:range_cover) {
-    TestHelper.moment 0...range_during.begin, range_during.end..40.0 }
+    TestHelper.range 0...range_during.begin, range_during.end..40.0 }
 
   let(:moment) { subject.new range }
   let(:moment_during) { subject.new range_during }
@@ -77,9 +77,15 @@ describe Timed::Moment do
 
     it 'accepts any object that responds to #begin' do
       obj = Minitest::Mock.new
+      obj.expect :is_a?, false, [Numeric]
       obj.expect :begin, moment.end
       assert moment.before?(obj)
       obj.verify
+    end
+    
+    it 'accepts Numerical values' do
+      assert moment.before?(moment.end)
+      refute moment.before?(moment.end - 1)
     end
   end
 
@@ -94,9 +100,15 @@ describe Timed::Moment do
 
     it 'accepts any object that responds to #end' do
       obj = Minitest::Mock.new
+      obj.expect :is_a?, false, [Numeric]
       obj.expect :end, moment.begin
       assert moment.after?(obj)
       obj.verify
+    end
+    
+    it 'accepts Numerical values' do
+      assert moment.after?(moment.begin)
+      refute moment.after?(moment.begin + 1)
     end
   end
 
@@ -113,6 +125,14 @@ describe Timed::Moment do
       assert moment.during?(range_during)
       refute moment.during?(range_after)
     end
+    
+    it 'accepts Numerical values' do
+      assert moment.during?(moment.begin)
+      assert moment.during?(moment.end)
+      
+      refute moment.during?(moment.begin - 1)
+      refute moment.during?(moment.end + 1)
+    end
   end
 
   describe '#intersect' do
@@ -121,7 +141,6 @@ describe Timed::Moment do
     end
 
     it 'returns a new moment that cover the common time between the two' do
-      skip
       moment_a = moment.intersect(moment_during)
       moment_b = moment_during.intersect(moment)
       moment_c = moment_during.intersect(moment_cover)
