@@ -39,7 +39,11 @@ module Timed
     def first(n = 1, after: nil, &block)
       return super(n, &block) unless after
       
-      super(n) { |item| item.after? after }
+      if include? after
+        first_item_after after, n, n
+      else
+        super(n) { |item| item.after? after }
+      end
     end
     
     # Extends the standard behaviour of Linked::List#last with the option of
@@ -56,7 +60,11 @@ module Timed
     def last(n = 1, before: nil, &block)
       return super(n, &block) unless before
       
-      super(n) { |item| item.before? before }
+      if include? before
+        last_item_before before, n
+      else
+        super(n) { |item| item.before? before }
+      end
     end
     
     # This method takes a second sequence and iterates over each intersection
