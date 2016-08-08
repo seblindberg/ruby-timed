@@ -1,5 +1,8 @@
 module Timed
   class Item < Linked::Item
+    # The value field is used to store the timespan and shuold not be accessed
+    # directly.
+    
     protected :value
     private :value=
     
@@ -63,19 +66,20 @@ module Timed
     # Return -1 if the item is before the other, 0 if they overlap and 1 if the
     # item is after the other.
     
-    def <=>(other)
-      case
-      when before?(other) then -1
-      when after?(other) then 1
-      else 0
-      end
-    end
+    # def <=>(other)
+    #   case
+    #   when before?(other) then -1
+    #   when after?(other) then 1
+    #   else 0
+    #   end
+    # end
     
-    # Inserts an item after this one in the sequence. For the operation to be
-    # valid it must occur after this item and before the next.
+    # Inserts an item after this one and before the next in the sequence. The
+    # new item may not overlap with the two it sits between. A RuntimeError will
+    # be raised if it does.
     #
     # If the given object is an Item it will be inserted directly. Otherwise, if
-    # the object responds to #begin and #end, a new Item will be created using
+    # the object responds to #begin and #end, a new Item will be created from
     # that timespan.
     
     def append(other)
@@ -84,6 +88,14 @@ module Timed
       
       super
     end
+    
+    # Inserts an item before this one and after the previous in the sequence.
+    # The new item may not overlap with the two it sits between. A RuntimeError
+    # will be raised if it does.
+    #
+    # If the given object is an Item it will be inserted directly. Otherwise, if
+    # the object responds to #begin and #end, a new Item will be created from
+    # that timespan.
     
     def prepend(other)
       raise RuntimeError unless after? other
@@ -94,6 +106,9 @@ module Timed
     
     # Override the default implementation and provide a more useful
     # representation of the Timed Item, including when it begins and ends.
+    #
+    # Example
+    #   item.inspect # => "Timed::Item   12.20 -> 15.50"
     #
     # Returns a string representation of the object.
     
