@@ -32,15 +32,12 @@ module Timed
     #
     # Returns one or more items, or nil if there are no items after the given
     # time.
-    #
-    # TODO: When given an Item to start after, and that item is in the list,
-    #       start directly from the item.
     
     def first(n = 1, after: nil, &block)
       return super(n, &block) unless after
       
       if include? after
-        first_item_after after, n, n
+        first_item_after after, n
       else
         super(n) { |item| item.after? after }
       end
@@ -53,9 +50,6 @@ module Timed
     #
     # Returns one or more items, or nil if there are no items before the given
     # time.
-    #
-    # TODO: When given an Item to start before, and that item is in the list,
-    #       start directly from the item.
     
     def last(n = 1, before: nil, &block)
       return super(n, &block) unless before
