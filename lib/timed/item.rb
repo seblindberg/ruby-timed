@@ -1,4 +1,10 @@
 module Timed
+  # Item
+  #
+  # The Timed Item is a Moment that can be chained to others to form a sequence.
+  # Importantly, items in a sequence are guaranteed to be sequential and non
+  # overlapping.
+  
   class Item < Linked::Item
     include Moment
     # The value field is used to store the timespan and shuold not be accessed

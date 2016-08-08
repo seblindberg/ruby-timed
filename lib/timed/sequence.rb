@@ -1,4 +1,19 @@
 module Timed
+  # Sequence
+  #
+  # This class implements a sequence of Timed Items. Any object that implements
+  # the methods #begin and #end can be push to the sequence. Note that the items
+  # must be inserted in chronological order, or the sequence will raise an
+  # exception.
+  #
+  # Example
+  #   sequence = Timed::Sequence.new
+  #   sequence << 2..3
+  #   sequence.prepend Timed::Item.new 1..2 # Same result as above
+  #
+  # A sequence can also be treated like a Moment and be compared, in time, with
+  # other compatible objects.
+  
   class Sequence
     include Moment
     include Linked::List
