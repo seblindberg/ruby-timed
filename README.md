@@ -4,7 +4,9 @@
 [![Coverage Status](https://coveralls.io/repos/github/seblindberg/ruby-timed/badge.svg?branch=master)](https://coveralls.io/github/seblindberg/ruby-timed?branch=master)
 [![Inline docs](http://inch-ci.org/github/seblindberg/ruby-timed.svg?branch=master)](http://inch-ci.org/github/seblindberg/ruby-timed)
 
-Gem for working with timed, ordered items. Currently under development.
+Gem for working with timed, ordered items. Still early days.
+
+The basic building block is the `Timed::Item`. These begin and end somewhere in time and can thus be related to each other. Several items can then be combined into a `Timed::Sequence`. This object guarantees that the items in it are non overlapping and ordered chronologically.
 
 ## Installation
 
@@ -24,7 +26,21 @@ Or install it yourself as:
 
 ## Usage
 
-Coming soon.
+```ruby
+require 'timed'
+
+# Create an empty
+sequence = Timed::Sequence.new
+
+# Add a couple of items. Any object that implements #begin
+# and #end can be added. Internally it is converted to a
+# Timed::Item.
+sequence << 10..20
+sequence << 30..40
+
+# Calculate the time occupied by the items in the sequence
+sequence.time # => 20
+```
 
 ## Development
 
