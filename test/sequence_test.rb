@@ -89,6 +89,47 @@ describe Timed::Sequence do
       assert_nil sequence.last(before: item_a)
     end
   end
+  
+  describe '#each_edge' do
+    it 'returns an enumerator when not given a block' do
+      assert_kind_of Enumerator, sequence.each_edge
+    end
+    
+    it 'iterates over the edges' do
+      res = []
+      sequence.each_edge { |edge| res << edge }
+      assert_equal item_a.begin, res[0]
+      assert_equal item_a.end, res[1]
+      assert_equal item_b.begin, res[2]
+      assert_equal item_b.end, res[3]
+    end
+  end
+  
+  describe '#each_leading_edge' do
+    it 'returns an enumerator when not given a block' do
+      assert_kind_of Enumerator, sequence.each_leading_edge
+    end
+
+    it 'iterates over the leading edges' do
+      res = []
+      sequence.each_leading_edge { |edge| res << edge }
+      assert_equal item_a.begin, res[0]
+      assert_equal item_b.begin, res[1]
+    end
+  end
+  
+  describe '#each_trailing_edge' do
+    it 'returns an enumerator when not given a block' do
+      assert_kind_of Enumerator, sequence.each_trailing_edge
+    end
+
+    it 'iterates over the leading edges' do
+      res = []
+      sequence.each_trailing_edge { |edge| res << edge }
+      assert_equal item_a.end, res[0]
+      assert_equal item_b.end, res[1]
+    end
+  end
 
   describe '#intersections' do
     it 'returns an enumerator when not given a block' do

@@ -75,6 +75,47 @@ module Timed
         super(n) { |item| item.before? before }
       end
     end
+    
+    # Iterate over all of the edges in the sequence. An edge is the point in
+    # time when an item either begins or ends. That time, a numeric value, will
+    # be yielded to the block. If a block is not given and enumerator is
+    # returned.
+    #
+    # Returns an enumerator if a block was not given.
+    
+    def each_edge
+      return to_enum __callee__ unless block_given?
+      
+      each_item do |item|
+        yield item.begin
+        yield item.end
+      end
+    end
+    
+    # Iterates over all the leading edges in the sequence. A leading edge is the
+    # point in time where an item begins. That time, a numeric value, will be
+    # yielded to the block. If a block is not given and enumerator is returned.
+    #
+    # Returns an enumerator if a block was not given.
+    
+    def each_leading_edge
+      return to_enum __callee__ unless block_given?
+      
+      each_item { |item| yield item.begin }
+    end
+    
+    # Iterates over all the trailing edges in the sequence. A trailing edge is
+    # the point in time where an item begins. That time, a numeric value, will
+    # be yielded to the block. If a block is not given and enumerator is
+    # returned.
+    #
+    # Returns an enumerator if a block was not given.
+    
+    def each_trailing_edge
+      return to_enum __callee__ unless block_given?
+      
+      each_item { |item| yield item.end }
+    end
 
     # This method takes a second sequence and iterates over each intersection
     # between the two. If a block is given, the beginning and end of each
