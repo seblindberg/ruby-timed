@@ -67,85 +67,7 @@ describe Timed::Item do
       assert_equal range.end, item.end
     end
   end
-  
-  describe '#duration' do
-    it 'returns the difference between the end and start times' do
-      assert_equal (range.end - range.begin), item.duration
-    end
-  end
-  
-  describe '#==' do
-    it 'returns true if the items share begin and end times' do
-      assert_equal item, item
-      assert_equal item, range
-    end
     
-    it 'returns false when the begin and end times are different' do
-      refute_equal item, item_after
-    end
-      
-    it 'returns false for objects without #begin' do
-      no_begin = Minitest::Mock.new
-      no_begin.expect(:end, 0)
-      refute_operator item, :==, no_begin
-    end
-    
-    it 'returns false for objects without #end' do
-      no_end = Minitest::Mock.new
-      no_end.expect(:begin, 0)
-      refute_operator item, :==, no_end
-    end
-  end
-  
-  describe '#before?' do
-    it 'returns true if the item ends before the other' do
-      assert item.before?(item_after)
-    end
-    
-    it 'returns false if the item does not end before the other' do
-      refute item.before?(item_during)
-    end
-    
-    it 'accepts any object that responds to #begin' do
-      obj = Minitest::Mock.new
-      obj.expect :begin, item.end
-      assert item.before?(obj)
-      obj.verify
-    end
-  end
-  
-  describe '#after?' do
-    it 'returns true if the item begins after the other ends' do
-      assert item_after.after?(item)
-    end
-    
-    it 'returns false if the item does not begin after the other ends' do
-      refute item_after.after?(item_during)
-    end
-    
-    it 'accepts any object that responds to #end' do
-      obj = Minitest::Mock.new
-      obj.expect :end, item.begin
-      assert item.after?(obj)
-      obj.verify
-    end
-  end
-  
-  describe '#during?' do
-    it 'returns true when the items overlap' do
-      assert item.during?(item_during)
-    end
-    
-    it 'returns false when the items do not overlap' do
-      refute item.during?(item_after)
-    end
-    
-    it 'accepts any object that responds to #begin and #end' do
-      assert item.during?(range_during)
-      refute item.during?(range_after)
-    end
-  end
-  
   describe '#intersect' do
     it 'return nil when the items does not intersect' do
       assert_nil item.intersect(item_after)
@@ -224,22 +146,6 @@ describe Timed::Item do
       assert_kind_of subject, item_after.prev
       assert_equal range.begin, item_after.prev.begin
       assert_equal range.end, item_after.prev.end
-    end
-  end
-  
-  describe '#inspect' do
-    it 'includes the class name' do
-      refute_nil item.inspect[item.class.name]
-    end
-    
-    it 'includes the start time' do
-      start_at = format '%.2f', range.begin
-      refute_nil item.inspect[start_at]
-    end
-    
-    it 'includes the end time' do
-      end_at = format '%.2f', range.end
-      refute_nil item.inspect[end_at]
     end
   end
 end
