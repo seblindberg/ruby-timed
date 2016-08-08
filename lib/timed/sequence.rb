@@ -26,12 +26,15 @@ module Timed
     end
     
     # This method takes a second sequence and iterates over each intersection
-    # between the two. If a block is given, the begin and end of each
+    # between the two. If a block is given, the beginning and end of each
     # intersecting period will be yielded to it. Otherwise an enumerator is
     # returned.
     #
-    # other - a sequence, or object that returns en enumerator yielding items in
-    #         response to #each_item.
+    # other - a sequence, or object that responds to #begin and #end and returns
+    #         a Timed::Item in response to #first
+    #
+    # Returns an enumerator unless a block is given, in which case the number of
+    # intersections is returned.
     
     def intersections(other)
       return to_enum __callee__, other unless block_given?
@@ -41,12 +44,12 @@ module Timed
       # Sort the first items from each sequence into leading
       # and trailing by whichever begins first
       if self.begin <= other.begin
-        item_l = first
-        item_t = other.first
+        item_l, item_t = first, other.first
       else
-        item_l = other.first
-        item_t = first
+        item_l, item_t = other.first, first
       end
+      
+      count = 0
       
       loop do
         # Now there are three posibilities:
@@ -60,10 +63,12 @@ module Timed
         #    ends
         when item_l.end <= item_t.end
           yield item_t.begin, item_l.end
+          count += 1
         
         # 3: The leading item ends after the trailing one
         else
           yield item_t.begin, item_t.end
+          count += 1
           
           # Swap leading and trailing
           item_l, item_t = item_t, item_l
@@ -75,21 +80,16 @@ module Timed
         # Swap leading and trailing if needed
         item_l, item_t = item_t, item_l if item_l.begin > item_t.begin
       end
+      
+      count
     end
     
     # Returns a new sequence with items that make up the intersection between
     # the two sequences.
     
     def intersect(other)
-      sequence = self.class.new
-      mutable_range = Struct.new(:begin, :end).new(0, 0)
-      
-      intersections other do |b, e|
-        mutable_range.begin = b
-        mutable_range.end = e
-        
-        sequence << mutable_range
-      end
+      intersections(other)
+        .with_object(self.class.new) { |(b, e), a| a << Item.new(b, e) }
     end
     
     alias & intersect

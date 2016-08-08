@@ -88,15 +88,42 @@ describe Timed::Sequence do
       
       assert_raises(StopIteration) { enum.next }
     end
+    
+    it 'returns the number of intersections' do
+      count = sequence_1.intersections(sequence_2) {}
+      assert_equal 2, count
+    end
   end
   
   describe '#intersect' do
+    it 'returns an empty sequence when there are no intersections' do
+      sequence_1 = subject.new << item_a
+      sequence_2 = subject.new << item_b
+            
+      assert sequence_1.intersect(sequence_2).empty?
+    end
     
+    it 'returns a new sequence of the intersections' do
+      intersecting_sequence = sequence_1.intersect sequence_2
+      
+      assert_equal intersection_a.begin, intersecting_sequence.first.begin
+      assert_equal intersection_a.end, intersecting_sequence.first.end
+      
+      assert_equal intersection_b.begin, intersecting_sequence.last.begin
+      assert_equal intersection_b.end, intersecting_sequence.last.end
+    end
+    
+    it 'is aliased to #&' do
+      assert_equal sequence.method(:intersect), sequence.method(:&)
+    end
   end
   
   describe '#intersect_time' do
     it 'returns 0 when there is no intersection' do
+      sequence_1 = subject.new << item_a
+      sequence_2 = subject.new << item_b
       
+      assert_equal 0, sequence_1.intersect_time(sequence_2)
     end
     
     it 'returns the total time of the intersections' do
