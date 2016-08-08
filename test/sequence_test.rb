@@ -104,7 +104,7 @@ describe Timed::Sequence do
       assert_equal item_b.end, res[3]
     end
   end
-  
+
   describe '#each_leading_edge' do
     it 'returns an enumerator when not given a block' do
       assert_kind_of Enumerator, sequence.each_leading_edge

@@ -7,6 +7,7 @@ module Timed
   
   class Item < Linked::Item
     include Moment
+
     # The value field is used to store the timespan and shuold not be accessed
     # directly.
 
