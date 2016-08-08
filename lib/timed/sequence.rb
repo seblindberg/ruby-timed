@@ -39,7 +39,45 @@ module Timed
     #         response to #each_item.
     
     def intersections(other)
+      return to_enum __callee__, other unless block_given?
       
+      # Sort the first items from each sequence into leading
+      # and trailing by whichever begins first
+      if self.begin <= other.begin
+        item_l = first
+        item_t = other.first
+      else
+        item_l = other.first
+        item_t = first
+      end
+      
+      loop do
+        # Now there are three posibilities:
+        case
+        # 1: The leading item ends before the trailing one
+        #    begins. In this case the items do not intersect
+        #    at all and we do nothing.
+        when item_l.end <= item_t.begin
+          
+        # 2: The leading item ends before the trailing one
+        #    ends
+        when item_l.end <= item_t.end
+          yield item_t.begin, item_l.end
+        
+        # 3: The leading item ends after the trailing one
+        else
+          yield item_t.begin, item_t.end
+          
+          # Swap leading and trailing
+          item_l, item_t = item_t, item_l
+        end
+        
+        # Advance the leading item
+        item_l = item_l.next
+        
+        # Swap leading and trailing if needed
+        item_l, item_t = item_t, item_l if item_l.begin > item_t.begin
+      end
     end
     
     # Returns a new sequence with items that make up the intersection between
