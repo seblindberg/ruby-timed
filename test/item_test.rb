@@ -3,30 +3,16 @@ require 'test_helper'
 describe Timed::Item do
   subject { ::Timed::Item }
   
-  let(:range) do
-    start_at = Random.rand 0.0..100.0
-    duration = Random.rand 1.0..10.0
-    end_at = start_at + duration
-    start_at..end_at
-  end
-  
-  let(:range_after) do
-    offset = Random.rand 0.0..10.0
-    duration = Random.rand 1.0..10.0
-    start_at = range.end + offset
-    end_at = start_at + duration
-    start_at..end_at
-  end
-  
-  let(:range_during) do
-    start_at = Random.rand range.begin..(range.end - 0.01)
-    end_at = Random.rand (range_after.begin + 0.01)..range_after.end
-    start_at..end_at
-  end
+  let(:range) { TestHelper.range 0.0..10.0, 11.0..20.0 }
+  let(:range_during) {
+    TestHelper.range 10.0...range.end, range_after.begin..30.0 }
+  let(:range_after) { TestHelper.range 20.0..30.0, 31.0..40.0 }
   
   let(:item) { subject.new range }
   let(:item_during) { subject.new range_during }
   let(:item_after) { subject.new range_after }
+  let(:item_cover) {
+    TestHelper.item 0...item_during.begin, item_during.end..40.0 }
   
   describe '.new' do
     it 'raises an exception with no argument' do
@@ -37,9 +23,12 @@ describe Timed::Item do
       arg = Minitest::Mock.new
       arg.expect :begin, 0
       arg.expect :end, 9
-      subject.new arg
+      
+      item = subject.new arg
       
       arg.verify
+      assert_equal 0, item.begin
+      assert_equal 9, item.end
     end
     
     it 'requires the timespan to begin before it ends' do
@@ -57,6 +46,13 @@ describe Timed::Item do
       arg.expect :end, 'z'
       
       assert_raises(TypeError) { subject.new arg }
+    end
+    
+    it 'also accepts a second argument' do
+      item = subject.new 0, 9
+      
+      assert_equal 0, item.begin
+      assert_equal 9, item.end
     end
   end
   
@@ -127,6 +123,31 @@ describe Timed::Item do
     end
   end
   
+  describe '#intersect' do
+    it 'return nil when the items does not intersect' do
+      assert_nil item.intersect(item_after)
+    end
+    
+    it 'returns a new Item that cover the common time between the two' do
+      item_a = item.intersect(item_during)
+      item_b = item_during.intersect(item)
+      item_c = item_during.intersect(item_cover)
+      
+      assert_equal item_during.begin, item_a.begin
+      assert_equal item.end, item_a.end
+      
+      assert_equal item_during.begin, item_b.begin
+      assert_equal item.end, item_b.end
+      
+      assert_equal item_during.begin, item_c.begin
+      assert_equal item_during.end, item_c.end
+    end
+    
+    it 'is aliased to #&' do
+      assert_equal item.method(:intersect), item.method(:&)
+    end
+  end
+  
   describe '#append' do
     it 'accepts correctly ordered items' do
       item.append item_after
@@ -138,12 +159,12 @@ describe Timed::Item do
     end
       
     it 'raises an error it the items overlap' do
-      item_a = subject.new 0..10
-      item_b = subject.new 20..30
+      item_a = subject.new 0, 10
+      item_b = subject.new 20, 30
       item_a.append item_b
       
-      assert_raises { item_a.append(subject.new 5..15) }
-      assert_raises { item_a.append(subject.new 15..25) }
+      assert_raises { item_a.append(subject.new 5, 15) }
+      assert_raises { item_a.append(subject.new 15, 25) }
     end
     
     it 'accepts objects responding to #begin and #end' do
@@ -166,12 +187,12 @@ describe Timed::Item do
     end
 
     it 'raises an error it the items overlap' do
-      item_a = subject.new 0..10
-      item_b = subject.new 20..30
+      item_a = subject.new 0, 10
+      item_b = subject.new 20, 30
       item_a.append item_b
       
-      assert_raises { item_b.prepend(subject.new 15..25) }
-      assert_raises { item_b.prepend(subject.new 5..15) }
+      assert_raises { item_b.prepend(subject.new 15, 25) }
+      assert_raises { item_b.prepend(subject.new 5, 15) }
     end
     
     it 'accepts objects responding to #begin and #end' do

@@ -10,11 +10,20 @@ module Timed
     # responds to #begin and #end with two numerical values. Note that the end
     # must occur after the start for the span to be valid.
     #
+    # If given a second argument, the two will instead be interpreted as the
+    # begin and end time.
+    #
     # timespan - object responding to #begin and #end.
+    # end_at - if given, it togheter with the first argument will be used as the
+    #          begin and end time for the item
     
-    def initialize timespan
-      begin_at = timespan.begin
-      end_at = timespan.end
+    def initialize timespan, end_at = nil
+      if end_at
+        begin_at = timespan
+      else
+        begin_at = timespan.begin
+        end_at = timespan.end
+      end
       
       raise TypeError unless begin_at.is_a?(Numeric) && end_at.is_a?(Numeric)
       raise ArgumentError if end_at < begin_at
@@ -60,6 +69,17 @@ module Timed
       other.begin <= self.begin && self.begin <= other.end ||
         self.begin <= other.begin && other.begin <= self.end
     end
+    
+    # Returns a new Item in the intersection
+    
+    def intersect(other)
+      begin_at = self.begin >= other.begin ? self.begin : other.begin
+      end_at = self.end <= other.end ? self.end : other.end
+      
+      begin_at <= end_at ? self.class.new(begin_at, end_at) : nil
+    end
+    
+    alias & intersect
     
     # Compare the item with others.
     #
