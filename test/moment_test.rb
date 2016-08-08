@@ -3,7 +3,7 @@ require 'test_helper'
 class Moment
   include Timed::Moment
   attr_accessor :begin, :end
-  
+
   def initialize range
     @begin = range.begin
     @end = range.end
@@ -82,7 +82,7 @@ describe Timed::Moment do
       assert moment.before?(obj)
       obj.verify
     end
-    
+
     it 'accepts Numerical values' do
       assert moment.before?(moment.end)
       refute moment.before?(moment.end - 1)
@@ -105,7 +105,7 @@ describe Timed::Moment do
       assert moment.after?(obj)
       obj.verify
     end
-    
+
     it 'accepts Numerical values' do
       assert moment.after?(moment.begin)
       refute moment.after?(moment.begin + 1)
@@ -125,11 +125,11 @@ describe Timed::Moment do
       assert moment.during?(range_during)
       refute moment.during?(range_after)
     end
-    
+
     it 'accepts Numerical values' do
       assert moment.during?(moment.begin)
       assert moment.during?(moment.end)
-      
+
       refute moment.during?(moment.begin - 1)
       refute moment.during?(moment.end + 1)
     end
