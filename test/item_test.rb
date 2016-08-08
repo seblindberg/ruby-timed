@@ -74,6 +74,29 @@ describe Timed::Item do
     end
   end
   
+  describe '#==' do
+    it 'returns true if the items share begin and end times' do
+      assert_equal item, item
+      assert_equal item, range
+    end
+    
+    it 'returns false when the begin and end times are different' do
+      refute_equal item, item_after
+    end
+      
+    it 'returns false for objects without #begin' do
+      no_begin = Minitest::Mock.new
+      no_begin.expect(:end, 0)
+      refute_operator item, :==, no_begin
+    end
+    
+    it 'returns false for objects without #end' do
+      no_end = Minitest::Mock.new
+      no_end.expect(:begin, 0)
+      refute_operator item, :==, no_end
+    end
+  end
+  
   describe '#before?' do
     it 'returns true if the item ends before the other' do
       assert item.before?(item_after)

@@ -46,35 +46,53 @@ module Timed
     # Returns the duration of the item.
     
     def duration
-      self.end - self.begin
+      value.end - value.begin
+    end
+    
+    # Returns true if the two items begin and end on exactly the same time.
+    #
+    # other - object that implements both #begin and #end.
+    
+    def ==(other)
+      value.begin == other.begin && value.end == other.end
+    rescue NoMethodError
+      false
     end
     
     # Returns true if the item ends before the other one begins.
+    #
+    # other - object that implements #begin.
     
     def before?(other)
-      self.end <= other.begin
+      value.end <= other.begin
     end
     
     # Returns true if the item begins after the other one ends.
+    #
+    # other - object that implements #end.
     
     def after?(other)
-      self.begin >= other.end
+      value.begin >= other.end
     end
     
     # Returns true if the item overlaps with the other one.
+    #
+    # other - object that implements both #begin and #end.
     
     def during?(other)
       # Check if either of the two items begins during the
       # span of the other
-      other.begin <= self.begin && self.begin <= other.end ||
-        self.begin <= other.begin && other.begin <= self.end
+      other.begin <= value.begin && value.begin <= other.end ||
+        value.begin <= other.begin && other.begin <= value.end
     end
     
     # Returns a new Item in the intersection
+    #
+    # other - object that implements both #begin and #end.
     
     def intersect(other)
-      begin_at = self.begin >= other.begin ? self.begin : other.begin
-      end_at = self.end <= other.end ? self.end : other.end
+      begin_at = value.begin >= other.begin ? value.begin : other.begin
+      end_at = value.end <= other.end ? value.end : other.end
       
       begin_at <= end_at ? self.class.new(begin_at, end_at) : nil
     end
@@ -133,7 +151,7 @@ module Timed
     # Returns a string representation of the object.
     
     def inspect
-      format '%s %7.2f -> %.2f', self.class.name, self.begin, self.end
+      format '%s %7.2f -> %.2f', self.class.name, value.begin, value.end
     end
   end
 end
