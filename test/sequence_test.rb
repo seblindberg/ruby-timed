@@ -41,14 +41,14 @@ describe Timed::Sequence do
     end
   end
 
-  describe '#length' do
+  describe '#duration' do
     it 'returns 0 for empty sequences' do
-      assert_equal 0, subject.new.length
+      assert_equal 0, subject.new.duration
     end
     
     it 'returns the time during which the sequence has items' do
-      true_length = item_b.end - item_a.begin
-      assert_equal true_length, sequence.length
+      true_duration = item_b.end - item_a.begin
+      assert_equal true_duration, sequence.duration
     end
   end
   

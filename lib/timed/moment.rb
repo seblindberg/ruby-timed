@@ -53,15 +53,17 @@ module Timed
     
     def during?(other)
       if other.is_a? Numeric
-        time_begin = time_end = other
+        other_begin = other_end = other
       else
-        time_begin = other.begin
-        time_end = other.begin
+        other_begin, other_end = other.begin, other.end
       end
+      
+      self_begin, self_end = self.begin, self.end
+      
       # Check if either of the two items begins during the
       # span of the other
-      time_begin <= self.begin && self.begin <= time_end ||
-        self.begin <= time_begin && time_begin <= self.end
+      other_begin <= self_begin && self_begin <= other_end ||
+        self_begin <= other_begin && other_begin <= self_end
     end
     
     # Returns a new moment in the intersection

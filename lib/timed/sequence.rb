@@ -19,12 +19,6 @@ module Timed
       empty? ? 0 : last.end
     end
     
-    # Returns the length of the enture sequence
-    
-    def length
-      empty? ? 0 : last.end - first.begin
-    end
-    
     # Returns the total time made up by the items
     
     def time
@@ -41,6 +35,8 @@ module Timed
     
     def intersections(other)
       return to_enum __callee__, other unless block_given?
+      
+      return unless during? other
       
       # Sort the first items from each sequence into leading
       # and trailing by whichever begins first
@@ -95,6 +91,8 @@ module Timed
         sequence << mutable_range
       end
     end
+    
+    alias & intersect
     
     # More efficient than first calling #intersect and then #time on the result.
     
