@@ -4,6 +4,8 @@ require 'test_helper'
 describe Timed::Sequence do
   subject { ::Timed::Sequence }
   let(:item_klass) { ::Timed::Item }
+  
+  let(:random_time) { Random.rand 1.0..100.0 }
 
   let(:item_a) { TestHelper.item 0...10, 10..20 }
   let(:item_b) { TestHelper.item 20...30, 30..40 }
@@ -87,6 +89,51 @@ describe Timed::Sequence do
       assert_same item_b, sequence.last(before: item_b.end)
       assert_same item_a, sequence.last(before: item_b)
       assert_nil sequence.last(before: item_a)
+    end
+  end
+  
+  describe '#offset_by' do
+    it 'defaults to no offset' do
+      new_sequence = subject.new
+      assert_equal random_time, new_sequence.offset(random_time)
+    end
+    
+    it 'allows the offset to be removed' do
+      sequence.offset_by 1
+      sequence.offset_by
+      assert_equal random_time, sequence.offset(random_time)
+    end
+    
+    it 'does not perform any operations when the offset is 0' do
+      sequence.offset_by 1
+      sequence.offset_by 0
+      
+      sometime = Minitest::Mock.new
+      sequence.offset sometime
+    end
+    
+    it 'accepts a constant offset' do
+      sequence.offset_by 5
+      assert_equal 5 + random_time, sequence.offset(random_time)
+    end
+    
+    it 'accepts a linear offset' do
+      sequence.offset_by 5, 1.05
+      assert_equal 5 + 1.05 * random_time, sequence.offset(random_time)
+    end
+    
+    it 'accepts a quadratic offset' do
+      time = 5 + 1.05 * random_time + 0.2 * random_time**2
+      sequence.offset_by 5, 1.05, 0.2
+      assert_equal time, sequence.offset(random_time)
+    end
+    
+    it 'raises an error when the order is higher than 2' do
+      assert_raises(ArgumentError) { sequence.offset_by 5, 1.05, 0.2, 0.1 }
+    end
+    
+    it 'is aliased to #offset=' do
+      assert_equal sequence.method(:offset_by), sequence.method(:offset=)
     end
   end
 

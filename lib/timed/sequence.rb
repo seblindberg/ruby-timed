@@ -2,8 +2,8 @@ module Timed
   # Sequence
   #
   # This class implements a sequence of Timed Items. Any object that implements
-  # the methods #begin and #end can be push to the sequence. Note that the items
-  # must be inserted in chronological order, or the sequence will raise an
+  # the methods #begin and #end can be added to the sequence. Note that the
+  # items must be inserted in chronological order, or the sequence will raise an
   # exception.
   #
   # Example
@@ -14,8 +14,16 @@ module Timed
   # A sequence can also be treated like a Moment and be compared, in time, with
   # other compatible objects.
   #
-  # TODO: Provide a mechanism for offsetting the items in the list, preferably
-  #       non destructivly and at least quadratically.
+  # Sequences also provide a mechanism to offset the items in it, in time by
+  # providing the #offset method. Items can use it to offset their begin and end
+  # times on the fly.
+  #
+  # Example
+  #   sequence.offset_by 10, 1.1, 0.01
+  #   #                  ^   ^    ^ Quadratic term
+  #   #                  |   + Linear term
+  #   #                  + Constant term
+  #   sequence.offset 42.0 # => 73.84
   
   class Sequence
     include Moment
@@ -81,6 +89,48 @@ module Timed
       else
         super(n) { |item| item.before? before }
       end
+    end
+    
+    # Offset the entire sequence by specifying the coefficients of a polynomial
+    # of up to degree 2. This is then used to recalculate the begin and end
+    # times of each item in the set. The operation does not change the items but
+    # is instead performed on the fly every time either #begin or #end is
+    # called.
+    #
+    # c - list of coefficients, starting with the constant term and ending with,
+    #     at most, the quadratic.
+    
+    def offset_by(*c)
+      body =
+        case c.length
+        when 0 then proc { |t| t }
+        when 1
+          if c[0] == 0 || !c[0]
+            proc { |t| t }
+          else
+            proc { |t| c[0] + t }
+          end
+        when 2 then proc { |t| c[0] + c[1] * t }
+        when 3 then proc { |t| c[0] + c[1] * t + c[2] * t**2 }
+        else
+          raise ArgumentError,
+                'Only polynomilas of order 2 or lower are supported'
+        end
+      
+      redefine_method :offset, body
+    end
+    
+    alias offset= offset_by
+    
+    # Offset any time using the current offset settings of the sequence. Note
+    # that this method is overridden everytime #offset_by is called.
+    #
+    # time - the time to be offset.
+    #
+    # Returns the offset time.
+    
+    def offset(time)
+      time
     end
     
     # Iterate over all of the edges in the sequence. An edge is the point in
@@ -226,6 +276,20 @@ module Timed
       total
     rescue StopIteration
       return 0
+    end
+    
+    # Private helper method for (re)defining method on the singleton class.
+    #
+    # name - symbol name of the method.
+    # body - proc that will be used as method body.
+    
+    private def redefine_method name, body
+      #self.class.send :remove_method, name
+      #self.class.send :define_method, name, body
+      singleton_class.send :remove_method, name
+    rescue NameError
+    ensure
+      singleton_class.send :define_method, name, body
     end
   end
 end

@@ -18,6 +18,7 @@ module Timed
     # of.
     
     alias sequence list
+    alias in_sequence? in_list?
 
     # Creates a new Timed Item from a timespan. A timespan is any object that
     # responds to #begin and #end with two numerical values. Note that the end
