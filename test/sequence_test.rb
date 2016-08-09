@@ -156,11 +156,6 @@ describe Timed::Sequence do
 
       assert_raises(StopIteration) { enum.next }
     end
-
-    it 'returns the number of intersections' do
-      count = sequence_1.intersections(sequence_2) {}
-      assert_equal 2, count
-    end
   end
 
   describe '#intersect' do
@@ -195,8 +190,46 @@ describe Timed::Sequence do
     end
 
     it 'returns the total time of the intersections' do
-      true_time = intersection_a.duration + intersection_b.duration
-      assert_equal true_time, sequence_1.intersect_time(sequence_2)
+      time = intersection_a.duration + intersection_b.duration
+      assert_equal time, sequence_1.intersect_time(sequence_2)
+    end
+    
+    describe 'from:' do
+      it 'affects the total' do
+        from = intersection_a.begin + 1
+        time = intersection_a.duration - 1 + intersection_b.duration
+        assert_equal time, sequence_1.intersect_time(sequence_2, from: from)
+      end
+      
+      it 'does nothing when from is small' do
+        from = intersection_a.begin
+        time = intersection_a.duration + intersection_b.duration
+        assert_equal time, sequence_1.intersect_time(sequence_2, from: from)
+      end
+      
+      it 'returns 0 when from is large' do
+        from = intersection_b.end
+        assert_equal 0, sequence_1.intersect_time(sequence_2, from: from)
+      end
+    end
+    
+    describe 'to:' do
+      it 'affects the total' do
+        to = intersection_b.end - 1
+        time = intersection_a.duration + intersection_b.duration - 1
+        assert_equal time, sequence_1.intersect_time(sequence_2, to: to)
+      end
+      
+      it 'does nothing when to is large' do
+        to = intersection_b.end
+        time = intersection_a.duration + intersection_b.duration
+        assert_equal time, sequence_1.intersect_time(sequence_2, to: to)
+      end
+      
+      it 'returns 0 when to is small' do
+        to = intersection_a.begin
+        assert_equal 0, sequence_1.intersect_time(sequence_2, to: to)
+      end
     end
   end
 end

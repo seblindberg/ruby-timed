@@ -13,10 +13,17 @@ module Timed
   #
   # A sequence can also be treated like a Moment and be compared, in time, with
   # other compatible objects.
+  #
+  # TODO: Provide a mechanism for offsetting the items in the list, preferably
+  #       non destructivly and at least quadratically.
   
   class Sequence
     include Moment
     include Linked::List
+    
+    # Provide a more ideomatic name for the identity method #list.
+    
+    alias sequence list
 
     # Returns the time at which the first item in the sequence, and therefore
     # the sequence as a whole, begins. If the sequence is empty, by convention,
@@ -125,10 +132,9 @@ module Timed
     # other - a sequence, or object that responds to #begin and #end and returns
     #         a Timed::Item in response to #first
     #
-    # Returns an enumerator unless a block is given, in which case the number of
-    # intersections is returned.
+    # Returns an enumerator unless a block is given.
 
-    def intersections(other)
+    def intersections(other, &block)
       return to_enum __callee__, other unless block_given?
 
       return unless during? other
@@ -136,44 +142,38 @@ module Timed
       # Sort the first items from each sequence into leading
       # and trailing by whichever begins first
       if self.begin <= other.begin
-        item_l, item_t = first, other.first
+        item_l, item_t = self.item, other.item
       else
-        item_l, item_t = other.first, first
+        item_l, item_t = other.item, self.item
       end
-
-      count = 0
 
       loop do
         # Now there are three posibilities:
-        
+      
         # 1: The leading item ends before the trailing one
         #    begins. In this case the items do not intersect
         #    at all and we do nothing.
         if item_l.end <= item_t.begin
-
+      
         # 2: The leading item ends before the trailing one
         #    ends
         elsif item_l.end <= item_t.end
           yield item_t.begin, item_l.end
-          count += 1
-
+      
         # 3: The leading item ends after the trailing one
         else
           yield item_t.begin, item_t.end
-          count += 1
-
+      
           # Swap leading and trailing
           item_l, item_t = item_t, item_l
         end
-
+      
         # Advance the leading item
         item_l = item_l.next
-
+      
         # Swap leading and trailing if needed
         item_l, item_t = item_t, item_l if item_l.begin > item_t.begin
       end
-
-      count
     end
 
     # Returns a new sequence with items that make up the intersection between
@@ -187,9 +187,45 @@ module Timed
     alias & intersect
 
     # More efficient than first calling #intersect and then #time on the result.
+    #
+    # from - a point in time to start from.
+    # to - a point in time to stop at.
+    #
+    # Returns the total time of the intersection between this sequence and the
+    # other one.
 
-    def intersect_time(other)
-      intersections(other).reduce(0) { |a, (b, e)| a + e - b }
+    def intersect_time(other, from: nil, to: nil)
+      enum = intersections(other)
+      total = 0
+      
+      if from
+        # Reuse the variable total. It's perhaps a bit messy
+        # and confusing but it works.
+        _, total = enum.next until total >= from
+        total -= from
+      end
+      
+      if to
+        loop do
+          b, e = enum.next
+          
+          if e > to
+            total += to - b unless b >= to
+            break
+          end
+          
+          total += e - b
+        end
+      else
+        loop do
+          b, e = enum.next
+          total += e - b
+        end
+      end
+      
+      total
+    rescue StopIteration
+      return 0
     end
   end
 end

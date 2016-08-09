@@ -13,6 +13,11 @@ module Timed
 
     protected :value
     private :value=
+    
+    # Provide a more ideomatic accessor for the sequence that the item is part
+    # of.
+    
+    alias sequence list
 
     # Creates a new Timed Item from a timespan. A timespan is any object that
     # responds to #begin and #end with two numerical values. Note that the end
