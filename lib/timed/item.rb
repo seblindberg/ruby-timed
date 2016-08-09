@@ -51,19 +51,6 @@ module Timed
       value.end
     end
 
-    # Returns a new Item in the intersection
-    #
-    # other - object that implements both #begin and #end.
-
-    def intersect(other)
-      begin_at = self.begin >= other.begin ? self.begin : other.begin
-      end_at = self.end <= other.end ? self.end : other.end
-
-      begin_at <= end_at ? self.class.new(begin_at, end_at) : nil
-    end
-
-    alias & intersect
-
     # Inserts an item after this one and before the next in the sequence. The
     # new item may not overlap with the two it sits between. A RuntimeError will
     # be raised if it does.

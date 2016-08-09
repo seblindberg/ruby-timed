@@ -81,19 +81,6 @@ module Timed
 
     alias & intersect
 
-    # Compare the moments with others.
-    #
-    # Return -1 if the item is before the other, 0 if they overlap and 1 if the
-    # item is after the other.
-
-    # def <=>(other)
-    #   case
-    #   when before?(other) then -1
-    #   when after?(other) then 1
-    #   else 0
-    #   end
-    # end
-
     # Override the default implementation and provide a more useful
     # representation of the Timed Moment, including when it begins and ends.
     #
