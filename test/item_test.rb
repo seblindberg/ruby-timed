@@ -14,13 +14,21 @@ describe Timed::Item do
   let(:item_after) { subject.new range_after }
   let(:item_cover) {
     TestHelper.item 0...item_during.begin, item_during.end..40.0 }
+    
+  let(:sequence) { Minitest::Mock.new }
+  
+  let(:item_in_seq) do
+    item_in_seq = subject.new 0, 9
+    item_in_seq.send :list=, sequence
+    item_in_seq
+  end
 
   describe '.new' do
     it 'raises an exception with no argument' do
       assert_raises(ArgumentError) { subject.new }
     end
 
-    it 'requires an argument that respond to both #begin and #end' do
+    it 'accepts a single argument that respond to both #begin and #end' do
       arg = Minitest::Mock.new
       arg.expect :begin, 0
       arg.expect :end, 9
@@ -49,11 +57,34 @@ describe Timed::Item do
       assert_raises(TypeError) { subject.new arg }
     end
 
-    it 'also accepts a second argument' do
+    it 'accepts two numerical arguments' do
       item = subject.new 0, 9
 
       assert_equal 0, item.begin
       assert_equal 9, item.end
+    end
+    
+    it 'accepts a sequence to add itself to' do
+      tail = Minitest::Mock.new
+      tail.expect :append, nil, [subject]
+      sequence.expect :tail, tail
+      
+      item = subject.new 0..9, sequence: sequence
+      
+      sequence.expect :equal?, true, [sequence]
+      
+      assert item.in_sequence?
+      assert item.in?(sequence)
+    end
+  end
+  
+  describe '#in_sequence?' do
+    it 'returns false when not in a sequence' do
+      refute item.in_sequence?
+    end
+    
+    it 'returns true when in a sequence' do
+      assert item_in_seq.in_sequence?
     end
   end
 
@@ -61,11 +92,23 @@ describe Timed::Item do
     it 'returns the start time' do
       assert_equal range.begin, item.begin
     end
+    
+    it 'calls Sequence#offset when in a sequence' do
+      sequence.expect :offset, 5, [0]
+      assert_equal 5, item_in_seq.begin
+      sequence.verify
+    end
   end
 
   describe '#end' do
     it 'returns the end time' do
       assert_equal range.end, item.end
+    end
+    
+    it 'calls Sequence#offset when in a sequence' do
+      sequence.expect :offset, 5, [9]
+      assert_equal 5, item_in_seq.end
+      sequence.verify
     end
   end
 

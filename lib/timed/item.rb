@@ -29,9 +29,10 @@ module Timed
     #
     # timespan - object responding to #begin and #end.
     # end_at - if given, it togheter with the first argument will be used as the
-    #          begin and end time for the item
+    #          begin and end time for the item.
+    # sequence - optional sequence to add the item to.
 
-    def initialize(timespan, end_at = nil)
+    def initialize(timespan, end_at = nil, sequence: nil)
       if end_at
         begin_at = timespan
       else
@@ -42,19 +43,19 @@ module Timed
       raise TypeError unless begin_at.is_a?(Numeric) && end_at.is_a?(Numeric)
       raise ArgumentError if end_at < begin_at
 
-      super begin_at..end_at
+      super begin_at..end_at, list: sequence
     end
 
     # Returns the time when the item starts.
 
     def begin
-      value.begin
+      offset value.begin
     end
 
     # Returns the time when the item ends.
 
     def end
-      value.end
+      offset value.end
     end
 
     # Inserts an item after this one and before the next in the sequence. The
@@ -85,6 +86,10 @@ module Timed
       raise RuntimeError unless first? || before?(previous)
 
       super
+    end
+    
+    protected def offset(time)
+      in_sequence? ? sequence.offset(time) : time
     end
   end
 end
