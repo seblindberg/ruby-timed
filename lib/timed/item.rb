@@ -87,6 +87,11 @@ module Timed
 
       super
     end
+    
+    # Offset a given time using the settings of the sequence, if the item is in
+    # a sequence.
+    #
+    # Returns the time offset correctly.
 
     protected def offset(time)
       in_sequence? ? sequence.offset(time) : time
