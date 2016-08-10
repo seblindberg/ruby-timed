@@ -231,7 +231,7 @@ module Timed
 
     def intersect(other)
       intersections(other)
-        .with_object(self.class.new) { |(b, e), a| a << Item.new(b, e) }
+        .with_object(self.class.new) { |(b, e), a| a << create_item(b, e) }
     end
 
     alias & intersect
@@ -296,8 +296,6 @@ module Timed
     # body - proc that will be used as method body.
     
     private def redefine_method name, body
-      #self.class.send :remove_method, name
-      #self.class.send :define_method, name, body
       singleton_class.send :remove_method, name
     rescue NameError
     ensure
