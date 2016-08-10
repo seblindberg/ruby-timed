@@ -251,7 +251,7 @@ module Timed
       if from
         # Reuse the variable total. It's perhaps a bit messy
         # and confusing but it works.
-        _, total = enum.next until total >= from
+        _, total = enum.next until total > from
         total -= from
       end
       
