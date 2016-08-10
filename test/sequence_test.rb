@@ -92,6 +92,14 @@ describe Timed::Sequence do
     end
   end
   
+  describe '#append' do
+    it 'accepts arbitrary objects' do
+      empty_sequence = subject.new
+      empty_sequence << (1..9)
+      assert_equal 1, empty_sequence.begin
+    end
+  end
+  
   describe '#offset_by' do
     it 'defaults to no offset' do
       new_sequence = subject.new

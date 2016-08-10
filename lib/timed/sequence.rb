@@ -278,6 +278,18 @@ module Timed
       return 0
     end
     
+    # Protected factory method for creating items compatible with the sequence.
+    # This method is called whenever an arbitrary object is pushed or unshifted
+    # onto the list and need to be wraped inside an Item.
+    #
+    # args - any arguments will be passed on to Item.new.
+    #
+    # Returns a new Item.
+    
+    protected def create_item(*args)
+      Item.new(*args)
+    end
+    
     # Private helper method for (re)defining method on the singleton class.
     #
     # name - symbol name of the method.
