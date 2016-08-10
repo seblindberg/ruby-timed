@@ -4,7 +4,7 @@ module Timed
   # The Timed Item is a Moment that can be chained to others to form a sequence.
   # Importantly, items in a sequence are guaranteed to be sequential and non
   # overlapping.
-  
+
   class Item < Linked::Item
     include Moment
 
@@ -13,10 +13,10 @@ module Timed
 
     protected :value
     private :value=
-    
+
     # Provide a more ideomatic accessor for the sequence that the item is part
     # of.
-    
+
     alias sequence list
     alias in_sequence? in_list?
 
@@ -87,7 +87,7 @@ module Timed
 
       super
     end
-    
+
     protected def offset(time)
       in_sequence? ? sequence.offset(time) : time
     end

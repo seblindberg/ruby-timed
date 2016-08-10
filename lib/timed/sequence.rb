@@ -17,13 +17,13 @@ module Timed
   # Sequences also provide a mechanism to offset the items in it, in time by
   # providing the #offset method. Items can use it to offset their begin and end
   # times on the fly.
-  
+
   class Sequence
     include Moment
     include Linked::List
-    
+
     # Provide a more ideomatic name for the identity method #list.
-    
+
     alias sequence list
 
     # Returns the time at which the first item in the sequence, and therefore
@@ -83,7 +83,7 @@ module Timed
         super(n) { |item| item.before? before }
       end
     end
-    
+
     # Offset the entire sequence by specifying the coefficients of a polynomial
     # of up to degree 2. This is then used to recalculate the begin and end
     # times of each item in the set. The operation does not change the items but
@@ -99,7 +99,7 @@ module Timed
     #
     # c - list of coefficients, starting with the constant term and ending with,
     #     at most, the quadratic.
-    
+
     def offset_by(*c)
       body =
         case c.length
@@ -116,61 +116,61 @@ module Timed
           raise ArgumentError,
                 'Only polynomilas of order 2 or lower are supported'
         end
-      
+
       redefine_method :offset, body
     end
-    
+
     alias offset= offset_by
-    
+
     # Offset any time using the current offset settings of the sequence. Note
     # that this method is overridden everytime #offset_by is called.
     #
     # time - the time to be offset.
     #
     # Returns the offset time.
-    
+
     def offset(time)
       time
     end
-    
+
     # Iterate over all of the edges in the sequence. An edge is the point in
     # time when an item either begins or ends. That time, a numeric value, will
     # be yielded to the block. If a block is not given and enumerator is
     # returned.
     #
     # Returns an enumerator if a block was not given.
-    
+
     def each_edge
       return to_enum __callee__ unless block_given?
-      
+
       each_item do |item|
         yield item.begin
         yield item.end
       end
     end
-    
+
     # Iterates over all the leading edges in the sequence. A leading edge is the
     # point in time where an item begins. That time, a numeric value, will be
     # yielded to the block. If a block is not given and enumerator is returned.
     #
     # Returns an enumerator if a block was not given.
-    
+
     def each_leading_edge
       return to_enum __callee__ unless block_given?
-      
+
       each_item { |item| yield item.begin }
     end
-    
+
     # Iterates over all the trailing edges in the sequence. A trailing edge is
     # the point in time where an item begins. That time, a numeric value, will
     # be yielded to the block. If a block is not given and enumerator is
     # returned.
     #
     # Returns an enumerator if a block was not given.
-    
+
     def each_trailing_edge
       return to_enum __callee__ unless block_given?
-      
+
       each_item { |item| yield item.end }
     end
 
@@ -199,28 +199,28 @@ module Timed
 
       loop do
         # Now there are three posibilities:
-      
+
         # 1: The leading item ends before the trailing one
         #    begins. In this case the items do not intersect
         #    at all and we do nothing.
         if item_l.end <= item_t.begin
-      
+
         # 2: The leading item ends before the trailing one
         #    ends
         elsif item_l.end <= item_t.end
           yield item_t.begin, item_l.end
-      
+
         # 3: The leading item ends after the trailing one
         else
           yield item_t.begin, item_t.end
-      
+
           # Swap leading and trailing
           item_l, item_t = item_t, item_l
         end
-      
+
         # Advance the leading item
         item_l = item_l.next
-      
+
         # Swap leading and trailing if needed
         item_l, item_t = item_t, item_l if item_l.begin > item_t.begin
       end
@@ -247,23 +247,23 @@ module Timed
     def intersect_time(other, from: nil, to: nil)
       enum = intersections(other)
       total = 0
-      
+
       if from
         # Reuse the variable total. It's perhaps a bit messy
         # and confusing but it works.
         _, total = enum.next until total > from
         total -= from
       end
-      
+
       if to
         loop do
           b, e = enum.next
-          
+
           if e > to
             total += to - b unless b >= to
             break
           end
-          
+
           total += e - b
         end
       else
@@ -272,12 +272,12 @@ module Timed
           total += e - b
         end
       end
-      
+
       total
     rescue StopIteration
       return 0
     end
-    
+
     # Protected factory method for creating items compatible with the sequence.
     # This method is called whenever an arbitrary object is pushed or unshifted
     # onto the list and need to be wraped inside an Item.
@@ -285,16 +285,16 @@ module Timed
     # args - any arguments will be passed on to Item.new.
     #
     # Returns a new Item.
-    
+
     protected def create_item(*args)
       Item.new(*args)
     end
-    
+
     # Private helper method for (re)defining method on the singleton class.
     #
     # name - symbol name of the method.
     # body - proc that will be used as method body.
-    
+
     private def redefine_method name, body
       singleton_class.send :remove_method, name
     rescue NameError
