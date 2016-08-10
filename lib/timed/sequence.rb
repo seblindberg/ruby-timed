@@ -17,13 +17,6 @@ module Timed
   # Sequences also provide a mechanism to offset the items in it, in time by
   # providing the #offset method. Items can use it to offset their begin and end
   # times on the fly.
-  #
-  # Example
-  #   sequence.offset_by 10, 1.1, 0.01
-  #   #                  ^   ^    ^ Quadratic term
-  #   #                  |   + Linear term
-  #   #                  + Constant term
-  #   sequence.offset 42.0 # => 73.84
   
   class Sequence
     include Moment
@@ -96,6 +89,13 @@ module Timed
     # times of each item in the set. The operation does not change the items but
     # is instead performed on the fly every time either #begin or #end is
     # called.
+    #
+    # Example
+    #   sequence.offset_by 10, 1.1, 0.01
+    #                      ^   ^    ^ Quadratic term
+    #                      |   + Linear term
+    #                      + Constant term
+    #   sequence.offset 42.0 # => 73.84
     #
     # c - list of coefficients, starting with the constant term and ending with,
     #     at most, the quadratic.
