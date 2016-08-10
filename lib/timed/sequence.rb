@@ -141,7 +141,7 @@ module Timed
     # Returns an enumerator if a block was not given.
 
     def each_edge
-      return to_enum __callee__ unless block_given?
+      return to_enum(__method__) { 2 * count } unless block_given?
 
       each_item do |item|
         yield item.begin
@@ -156,7 +156,7 @@ module Timed
     # Returns an enumerator if a block was not given.
 
     def each_leading_edge
-      return to_enum __callee__ unless block_given?
+      return to_enum(__method__) { count } unless block_given?
 
       each_item { |item| yield item.begin }
     end
@@ -169,7 +169,7 @@ module Timed
     # Returns an enumerator if a block was not given.
 
     def each_trailing_edge
-      return to_enum __callee__ unless block_given?
+      return to_enum(__method__) { count } unless block_given?
 
       each_item { |item| yield item.end }
     end

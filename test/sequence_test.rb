@@ -146,8 +146,10 @@ describe Timed::Sequence do
   end
 
   describe '#each_edge' do
-    it 'returns an enumerator when not given a block' do
-      assert_kind_of Enumerator, sequence.each_edge
+    it 'returns a sized enumerator when not given a block' do
+      enum = sequence.each_edge
+      assert_kind_of Enumerator, enum
+      assert_equal sequence.count * 2, enum.count
     end
 
     it 'iterates over the edges' do
@@ -161,8 +163,10 @@ describe Timed::Sequence do
   end
 
   describe '#each_leading_edge' do
-    it 'returns an enumerator when not given a block' do
-      assert_kind_of Enumerator, sequence.each_leading_edge
+    it 'returns a sized enumerator when not given a block' do
+      enum = sequence.each_leading_edge
+      assert_kind_of Enumerator, enum
+      assert_equal sequence.count, enum.count
     end
 
     it 'iterates over the leading edges' do
@@ -174,8 +178,10 @@ describe Timed::Sequence do
   end
 
   describe '#each_trailing_edge' do
-    it 'returns an enumerator when not given a block' do
-      assert_kind_of Enumerator, sequence.each_trailing_edge
+    it 'returns a sized enumerator when not given a block' do
+      enum = sequence.each_trailing_edge
+      assert_kind_of Enumerator, enum
+      assert_equal sequence.count, enum.count
     end
 
     it 'iterates over the leading edges' do
